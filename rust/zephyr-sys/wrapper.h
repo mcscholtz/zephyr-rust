@@ -9,6 +9,7 @@
 #include <drivers/uart.h>
 #include <uart_buffered.h>
 #include <drivers/eeprom.h>
+#include <drivers/adc.h>
 
 #ifdef CONFIG_POSIX_CLOCK
 #include <posix/time.h>

@@ -144,8 +144,27 @@ def main():
     # syscalls/foo.h. But there are odd cases like clock_gettime() on posix
     # where the syscall header is not included, so we must not include the
     # syscall header directly.
-    whitelist = set(["kernel.h", "kobject.h", "device.h", "uart.h", "mutex.h", "errno_private.h", "eeprom.h", "time.h"])
-    includes = ["kernel.h", "device.h", "drivers/uart.h", "sys/mutex.h", "sys/errno_private.h", "drivers/eeprom.h", "posix/time.h"]
+    whitelist = set([
+        "kernel.h", 
+        "kobject.h", 
+        "device.h", 
+        "uart.h", 
+        "mutex.h", 
+        "errno_private.h", 
+        "eeprom.h", 
+        "time.h", 
+        "adc.h"
+    ])
+    includes = [
+        "kernel.h", 
+        "device.h", 
+        "drivers/uart.h", 
+        "sys/mutex.h", 
+        "sys/errno_private.h", 
+        "drivers/eeprom.h", 
+        "posix/time.h", 
+        "drivers/adc.h"
+    ]
 
     # Hack because z_sys_mutex_kernel_lock is not defined in sys/mutex.h for !USERSPACE
     includes.append("syscalls/mutex.h")

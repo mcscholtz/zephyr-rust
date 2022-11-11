@@ -4,6 +4,7 @@ extern crate zephyr_sys;
 use std::io;
 
 pub use zephyr_core::*;
+pub mod adc;
 pub mod device;
 pub mod eeprom;
 pub mod uart;

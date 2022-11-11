@@ -30,4 +30,9 @@ fn main() {
             println!("cargo:rustc-cfg=tls");
         }
     }
+    if let Ok(tls) = std::env::var("CONFIG_ADC_ASYNC") {
+        if tls == "y" {
+            println!("cargo:rustc-cfg=adc_async");
+        }
+    }
 }
