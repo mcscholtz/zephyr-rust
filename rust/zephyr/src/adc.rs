@@ -13,12 +13,12 @@ use crate::device::Device;
 /// Raw syscall API
 pub trait AdcSyscalls {
     unsafe fn adc_channel_setup(device: *const Device, channel_cfg: *const adc_channel_cfg) -> io::Result<()>;
-    unsafe fn adc_read(device: *const Device, sequence: *mut adc_sequence) -> io::Result<()>;
+    unsafe fn adc_read(device: *const Device, sequence: *const adc_sequence) -> io::Result<()>;
     #[cfg(adc_async)]
-    unsafe fn adc_read_async(device: *mut Device, sequence: *mut adc_sequence, async_: *mut k_poll_signal) -> io::Result<()>;
+    unsafe fn adc_read_async(device: *mut Device, sequence: *const adc_sequence, async_: *mut k_poll_signal) -> io::Result<()>;
     unsafe fn adc_ref_internal(device: *const Device) -> u16;
 }
- 
+
 macro_rules! trait_impl {
     ($context:ident, $context_struct:path) => {
         impl AdcSyscalls for $context_struct {
@@ -37,7 +37,7 @@ macro_rules! trait_impl {
             #[inline(always)]
             unsafe fn adc_read(
                 device: *const Device,
-                sequence: *mut adc_sequence
+                sequence: *const adc_sequence
             ) -> io::Result<()> {
                 zephyr_sys::syscalls::$context::adc_read(
                     device,
@@ -50,7 +50,7 @@ macro_rules! trait_impl {
             #[inline(always)]
             unsafe fn adc_read_async(
                 device: *const Device,
-                sequence: *mut adc_sequence,
+                sequence: *const adc_sequence,
                 async_: *mut k_poll_signal
             ) -> io::Result<()> {
                 zephyr_sys::syscalls::$context::adc_read_async(
