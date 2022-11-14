@@ -57,28 +57,3 @@ trait_impl!(kernel, crate::context::Kernel);
 trait_impl!(user, crate::context::User);
 trait_impl!(any, crate::context::Any);
 
-pub struct Eeprom(&'static Device);
-
-impl Eeprom {
-    /// # Safety
-    ///
-    /// Caller must ensure the device is an eeprom device
-    pub unsafe fn new(dev: &'static Device) -> Self {
-        Eeprom(dev)
-    }
-
-    #[inline(always)]
-    pub fn read<C: EepromSyscalls>(&self, offset: off_t, data: &mut [u8]) -> io::Result<()> {
-        unsafe { C::eeprom_read(self.0 as *const _ as *mut _, offset, data) }
-    }
-
-    #[inline(always)]
-    pub fn write<C: EepromSyscalls>(&self, offset: off_t, data: &[u8]) -> io::Result<()> {
-        unsafe { C::eeprom_write(self.0 as *const _ as *mut _, offset, data) }
-    }
-
-    #[inline(always)]
-    pub fn size<C: EepromSyscalls>(&self) -> usize {
-        unsafe { C::eeprom_get_size(self.0 as *const _ as *mut _) }
-    }
-}
