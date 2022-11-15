@@ -8,6 +8,7 @@ pub mod adc;
 pub mod device;
 pub mod eeprom;
 pub mod uart;
+pub mod modbus;
 
 trait NegErrno: NegErr {
     fn neg_errno(&self) -> io::Result<u32>;
