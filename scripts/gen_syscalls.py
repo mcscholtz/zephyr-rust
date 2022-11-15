@@ -153,7 +153,8 @@ def main():
         "errno_private.h", 
         "eeprom.h", 
         "time.h", 
-        "adc.h"
+        "adc.h",
+        "gpio.h",
     ])
     includes = [
         "kernel.h", 
@@ -163,7 +164,8 @@ def main():
         "sys/errno_private.h", 
         "drivers/eeprom.h", 
         "posix/time.h", 
-        "drivers/adc.h"
+        "drivers/adc.h",
+        "drivers/gpio.h",
     ]
 
     # Hack because z_sys_mutex_kernel_lock is not defined in sys/mutex.h for !USERSPACE
