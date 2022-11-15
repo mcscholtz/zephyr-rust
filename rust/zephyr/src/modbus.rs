@@ -113,14 +113,109 @@ pub trait ModbusClientSyscalls {
 }
 
 
-pub struct ModbusServer {
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum ModbusReturnCode {
+	Okay,
+	IllegalFunction,
+	ReadOnlyRegister,
+	PermissionDenied,
+	IllegalDataAddress,
+	IllegalDataValue,
+	ServerDeviceFailure,
+	SlaveDeviceBusy,
+}
+
+impl Into<libc::c_int> for ModbusReturnCode {
+	fn into(self) -> libc::c_int {
+		match self {
+			ModbusReturnCode::None => 0,
+			ModbusReturnCode::IllegalFunction
+			| ModbusReturnCode::ReadOnlyRegister
+			| ModbusReturnCode::PermissionDenied
+			| ModbusReturnCode::InvalidPassword => -1,
+			ModbusReturnCode::IllegalDataAddress => -2,
+			ModbusReturnCode::IllegalDataValue => -3,
+			ModbusReturnCode::ServerDeviceFailure => -4,
+			ModbusReturnCode::SlaveDeviceBusy => -6,
+		}
+	}
+}
+
+pub struct ModbusServer<const N: usize> {
 	iface: u8,
+	regs: [u16; N],
+	holding_reg_handler: Option<fn(u16, u16) -> ModbusReturnCode>,
+	coil_handler: Option<fn(u16, bool) -> ModbusReturnCode>,
 }
 
 impl ModbusServer {
 	pub fn new(iface: u8) -> Self {
 		Self { iface }
 	}
+
+	// register a callback that when a register has been written to
+	pub fn register_write_holding_reg_handler(&mut self, handler: Fn(addr: u16, value: u16) -> ModbusReturnCode) {
+		self.holding_reg_handler = Some(handler);
+	}
+
+	pub fn register_write_coils_handler(&mut self, handler: Fn(addr: u16, value: bool) -> ModbusReturnCode) {
+		self.coil_handler = Some(handler);
+	}
+
+	#[inline(always)]
+	fn address_valid(&self, addr: u16) -> bool {
+		addr < N as u16
+	}
 }
 
-impl
+impl ModbusServerSyscalls for ModbusServer {
+	fn modbus_init_server(iface: libc::c_int, param: modbus_iface_param) -> io::Result<()> {
+		unsafe {
+			NegErrno::result(zephyr_sys::raw::modbus_init_server(iface, param))
+				.map(|_| ())
+		}
+	}
+
+	#[no_mangle]
+	fn modbus_read_coils_cb(addr: u16, state: *mut bool) -> libc::c_int {
+		if !self.address_valid(addr) {
+			return ModbusReturnCode::IllegalDataAddress.into();
+		}
+
+	}
+
+	#[no_mangle]
+	fn modbus_write_coils_cb(addr: u16, state: bool) -> libc::c_int {
+		if !self.address_valid(addr) {
+			return ModbusReturnCode::IllegalDataAddress.into();
+		}
+	}
+
+	#[no_mangle]
+	fn modbus_read_dinputs_cb(addr: u16, state: *mut bool) -> libc::c_int {
+		if !self.address_valid(addr) {
+			return ModbusReturnCode::IllegalDataAddress.into();
+		}
+	}
+
+	#[no_mangle]
+	fn modbus_read_input_regs_cb(addr: u16, reg: *mut u16) -> libc::c_int {
+		if !self.address_valid(addr) {
+			return ModbusReturnCode::IllegalDataAddress.into();
+		}
+	}
+
+	#[no_mangle]
+	fn modbus_read_holding_reg_cb(addr: u16, reg: *mut u16) -> libc::c_int {
+		if !self.address_valid(addr) {
+			return ModbusReturnCode::IllegalDataAddress.into();
+		}
+	}
+
+	#[no_mangle]
+	fn modbus_write_holding_reg_cb(addr: u16, reg: u16) -> libc::c_int {
+		if !self.address_valid(addr) {
+			return ModbusReturnCode::IllegalDataAddress.into();
+		}
+	}
+}
