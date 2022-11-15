@@ -11,6 +11,7 @@
 #include <drivers/eeprom.h>
 #include <drivers/adc.h>
 #include <modbus/modbus.h>
+#include <drivers/gpio.h>
 
 #ifdef CONFIG_POSIX_CLOCK
 #include <posix/time.h>
