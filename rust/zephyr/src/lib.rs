@@ -8,9 +8,9 @@ pub mod adc;
 pub mod device;
 pub mod eeprom;
 pub mod uart;
-pub mod modbus;
+pub mod gpio;
 
-trait NegErrno: NegErr {
+pub trait NegErrno: NegErr {
     fn neg_errno(&self) -> io::Result<u32>;
     fn zero_or_neg_errno(&self) -> io::Result<()>;
 }
