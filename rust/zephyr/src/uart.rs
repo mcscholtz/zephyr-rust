@@ -1,6 +1,37 @@
 use super::NegErr;
 use crate::device::Device;
 
+pub use zephyr_sys::raw::{
+    uart_config_parity_UART_CFG_PARITY_NONE,
+    uart_config_parity_UART_CFG_PARITY_ODD,
+    uart_config_parity_UART_CFG_PARITY_EVEN,
+    uart_config_parity_UART_CFG_PARITY_MARK,
+    uart_config_parity_UART_CFG_PARITY_SPACE,
+    uart_config_parity
+};
+
+#[derive(Clone, Copy)]
+#[repr(u8)]
+pub enum Parity {
+    None,
+    Odd,
+    Even,
+    Mark,
+    Space,
+}
+
+impl Into<uart_config_parity> for Parity {
+    fn into(self) -> uart_config_parity {
+        match self {
+            Parity::None => uart_config_parity_UART_CFG_PARITY_NONE,
+            Parity::Odd => uart_config_parity_UART_CFG_PARITY_ODD,
+            Parity::Even => uart_config_parity_UART_CFG_PARITY_EVEN,
+            Parity::Mark => uart_config_parity_UART_CFG_PARITY_MARK,
+            Parity::Space => uart_config_parity_UART_CFG_PARITY_SPACE,
+        }
+    }
+}
+
 pub trait UartSyscalls {
     fn uart_poll_out(device: &Device, out_char: char);
 
