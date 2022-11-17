@@ -7,6 +7,7 @@ extern crate derive_more;
 pub mod kobj;
 pub mod memdomain;
 pub mod mempool;
+pub mod msg_queue;
 pub mod mutex;
 pub mod mutex_alloc;
 pub mod poll;
